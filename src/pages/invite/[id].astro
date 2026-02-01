@@ -1,0 +1,198 @@
+---
+import "/src/styles/global.css";
+import styles from "./[id].module.css";
+import Pills from "../../components/Pills.astro";
+import ReactEntrypoint from "../../components/ReactEntrypoint.astro";
+
+export const prerender = false;
+
+const id = Astro.params.id;
+
+if (!id) {
+  Astro.response.status = 404;
+  Astro.response.statusText = "Not found";
+  return;
+}
+
+const inviteApiUrl = `https://discord.com/api/v9/invites/${id}?with_counts=true&with_expiration=true&with_permissions=true`;
+
+const response = await fetch(inviteApiUrl);
+if (!response.ok) {
+  Astro.response.status = response.status;
+  Astro.response.statusText = response.statusText;
+  return;
+}
+
+const invite = await response.json();
+console.log(invite);
+
+// Format member count with commas
+const memberCount =
+  invite.approximate_member_count?.toLocaleString() ||
+  invite.profile?.member_count?.toLocaleString() ||
+  "0";
+
+const approxPresenceCount =
+  invite.approximate_presence_count?.toLocaleString() ||
+  invite.profile?.presence_count?.toLocaleString() ||
+  "0";
+
+// Construct description with member count
+const description =
+  invite.guild.description || invite.profile?.description || "";
+const descriptionWithCount = `${description} | ${memberCount} members`;
+
+// Construct title
+const title = `Join the ${invite.guild.name} Discord Server!`;
+
+// Construct splash image URL
+const splashImageUrlMeta = invite.guild.splash
+  ? `https://cdn.discordapp.com/splashes/${invite.guild.id}/${invite.guild.splash}.jpg?size=512`
+  : null;
+
+const splashImageUrl = invite.guild.splash
+  ? `https://cdn.discordapp.com/splashes/${invite.guild.id}/${invite.guild.splash}.jpg?size=4096`
+  : null;
+
+const iconImageUrl = invite.guild.icon
+  ? `https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}.jpg?size=512`
+  : null;
+
+// Construct canonical URL
+const canonicalUrl = `https://discord.com/invite/${id}`;
+
+// Locale alternates
+const locales = [
+  "da",
+  "nl",
+  "uk",
+  "id",
+  "fi",
+  "no",
+  "ro",
+  "it",
+  "zh-TW",
+  "sv-SE",
+  "pl",
+  "hu",
+  "th",
+  "cs",
+  "vi",
+  "ko",
+  "ar",
+  "ja",
+  "lt",
+  "bg",
+  "pt-BR",
+  "es-419",
+  "he",
+  "zh-CN",
+  "el",
+  "en-GB",
+  "hi",
+  "en-US",
+  "es-ES",
+  "de",
+  "ru",
+  "tr",
+  "fr",
+  "hr",
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=3.0"
+      name="viewport"
+    />
+    <meta name="description" content={descriptionWithCount} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@discord" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={descriptionWithCount} />
+    <meta property="og:title" content={title} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:description" content={descriptionWithCount} />
+    <meta property="og:site_name" content="Discord" />
+    <link rel="canonical" href={canonicalUrl} />
+    {
+      locales.map((locale) => (
+        <meta property="og:locale:alternate" content={locale} />
+      ))
+    }
+    <meta property="og:locale" content="en-US" />
+    {
+      locales.map((locale) => (
+        <link
+          rel="alternate"
+          hreflang={locale}
+          href={`${canonicalUrl}?locale=${locale}`}
+        />
+      ))
+    }
+    {
+      splashImageUrlMeta && (
+        <>
+          <meta property="og:image" content={splashImageUrlMeta} />
+          <meta property="og:image:type" content="image/jpeg" />
+          <meta property="og:image:width" content="512" />
+          <meta property="og:image:height" content="512" />
+          <meta property="twitter:image" content={splashImageUrlMeta} />
+        </>
+      )
+    }
+    <title>{title}</title>
+    <script>
+      import styles from "./[id].module.css";
+      function showSplashImage(img: HTMLImageElement) {
+        img.classList.add(styles.loaded);
+      }
+
+      const splashImage = document.getElementById(
+        "splash-image",
+      ) as HTMLImageElement | null;
+      if (splashImage) {
+        if (splashImage.complete) {
+          showSplashImage(splashImage);
+        } else {
+          splashImage.addEventListener("load", () => {
+            showSplashImage(splashImage);
+          });
+        }
+      } else {
+        console.log("splash image not found");
+      }
+    </script>
+  </head>
+  <body>
+    <div class={styles.background}>
+      <img
+        id="splash-image"
+        class={styles.splashImage}
+        src={splashImageUrl}
+        alt={invite.guild.name}
+      />
+      <div class={styles.leftSplit}>
+        <div class={styles.wrapper}>
+          <section class={styles.authBox}>
+            <div class="flex flex-col items-center gap-2 w-full">
+              <div
+                style={`background-image: url(${iconImageUrl})`}
+                class={styles.iconImage}
+              >
+              </div>
+              <div>You've been invited to join</div>
+              <h1 class="font-sans text-xl font-extrabold">
+                {invite.guild.name}
+              </h1>
+              <Pills online={approxPresenceCount} total={memberCount} />
+              <ReactEntrypoint />
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

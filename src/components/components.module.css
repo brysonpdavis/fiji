@@ -1,0 +1,31 @@
+.pills {
+    flex: 1 1 auto;
+    gap: 24px;
+    flex-wrap: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-direction: row;
+}
+
+.pill {
+    align-items: center;
+    display: flex;
+}
+
+.pillIcon {
+    border-radius: 50%;
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+    -webkit-margin-end: 4px;
+    margin-inline-end: 4px;
+
+    &.online {
+        background-color: #43b581;
+    }
+
+    &.total {
+        background-color: #99aab5;
+    }
+}
