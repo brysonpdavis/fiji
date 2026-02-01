@@ -5,7 +5,9 @@ import react from '@astrojs/react';
 
 import tailwindcss from '@tailwindcss/vite';
 
-import cloudflare from '@astrojs/cloudflare';
+
+import vercel from '@astrojs/vercel';
+
 
 export default defineConfig({
   integrations: [react()],
@@ -14,5 +16,5 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  adapter: cloudflare(),
+  adapter: vercel(),
 });
