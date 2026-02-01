@@ -24,7 +24,6 @@ if (!response.ok) {
 }
 
 const invite = await response.json();
-console.log(invite);
 
 // Format member count with commas
 const memberCount =
@@ -51,7 +50,7 @@ const splashImageUrlMeta = invite.guild.splash
   : null;
 
 const splashImageUrl = invite.guild.splash
-  ? `https://cdn.discordapp.com/splashes/${invite.guild.id}/${invite.guild.splash}.jpg?size=4096`
+  ? `https://cdn.discordapp.com/splashes/${invite.guild.id}/${invite.guild.splash}.webp?size=4096`
   : null;
 
 const iconImageUrl = invite.guild.icon
