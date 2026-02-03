@@ -73,6 +73,14 @@ const iconImageUrl = invite.guild.icon
         }
       }
     </script>
+    <script>
+      import { onCLS, onINP, onLCP, onFCP } from "web-vitals";
+
+      onCLS(console.log);
+      onINP(console.log);
+      onLCP(console.log);
+      onFCP(console.log);
+    </script>
   </head>
   <body>
     <div class={styles.background}>
